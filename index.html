@@ -11,6 +11,9 @@
         body { font-family: 'Noto Sans SC', sans-serif; scroll-behavior: smooth; }
         .gradient-bg { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); }
         .code-block { background-color: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; font-family: monospace; overflow-x: auto; }
+        /* 图片悬停效果 */
+        .zoom-img { transition: transform 0.3s ease; cursor: pointer; }
+        .zoom-img:hover { transform: scale(1.02); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -25,7 +28,7 @@
             <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
                 <a href="#about" class="hover:text-blue-600 transition">项目简介</a>
                 <a href="#analysis" class="hover:text-blue-600 transition">数据探索</a>
-                <a href="#model" class="hover:text-blue-600 transition">模型架构</a>
+                <a href="#model" class="hover:text-blue-600 transition">模型评估</a>
                 <a href="#demo" class="hover:text-blue-600 transition">在线演示</a>
                 <a href="#code" class="hover:text-blue-600 transition">核心代码</a>
             </div>
@@ -33,8 +36,9 @@
     </nav>
 
     <!-- Hero 区域 -->
-    <header class="gradient-bg text-white pt-32 pb-48 clip-path-slant">
+    <section id="about" class="gradient-bg text-white pt-32 pb-48 clip-path-slant">
         <div class="max-w-4xl mx-auto px-4 text-center">
+            <span class="bg-blue-800 text-blue-100 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-4 inline-block">Course Project 2025</span>
             <h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
                 基于基础模型的<br>皮肤病变智能诊断系统
             </h1>
@@ -45,12 +49,12 @@
                 <a href="#demo" class="bg-white text-blue-600 px-8 py-3 rounded-full font-bold shadow-lg hover:bg-blue-50 hover:scale-105 transition transform duration-200">
                     <i class="fa-solid fa-play mr-2"></i> 查看演示
                 </a>
-                <a href="#report" class="bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg border border-blue-500 hover:bg-blue-800 transition">
-                    <i class="fa-solid fa-file-pdf mr-2"></i> 下载报告
+                <a href="https://github.com/SiyuanYan1/PanDerm" target="_blank" class="bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg border border-blue-500 hover:bg-blue-800 transition">
+                    <i class="fa-brands fa-github mr-2"></i> PanDerm 源码
                 </a>
             </div>
         </div>
-    </header>
+    </section>
 
     <!-- 数据分析展示 -->
     <section id="analysis" class="py-20 -mt-20 relative z-10">
@@ -61,25 +65,43 @@
                     <div class="w-16 h-1 bg-blue-500 mx-auto rounded"></div>
                 </div>
                 
+                <!-- 图表 1: 类别成分 -->
                 <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
                     <div class="space-y-6">
                         <div class="flex items-start">
-                            <div class="bg-blue-100 p-3 rounded-lg mr-4 text-blue-600"><i class="fa-solid fa-chart-bar fa-xl"></i></div>
+                            <div class="bg-blue-100 p-3 rounded-lg mr-4 text-blue-600"><i class="fa-solid fa-chart-pie fa-xl"></i></div>
                             <div>
-                                <h3 class="text-xl font-bold mb-2">极端类别不平衡</h3>
-                                <p class="text-gray-600">数据集呈现严重的长尾分布。Class 0 (良性痣) 样本量过万，而 Class 3 (不确定病变) 仅有数十例。这导致标准交叉熵损失函数失效，我们在训练中引入了 <strong>Weighted Random Sampler</strong>。</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="bg-purple-100 p-3 rounded-lg mr-4 text-purple-600"><i class="fa-solid fa-project-diagram fa-xl"></i></div>
-                            <div>
-                                <h3 class="text-xl font-bold mb-2">特征空间重叠</h3>
-                                <p class="text-gray-600">Zero-shot UMAP 可视化显示，良性与恶性黑色素瘤在特征空间中高度纠缠。这证明了仅靠线性探测是不够的，必须进行全参数微调以重构特征流形。</p>
+                                <h3 class="text-xl font-bold mb-2">细粒度类别构成</h3>
+                                <p class="text-gray-600">
+                                    DERM12345 数据集包含 40 个子类，映射为 5 个 Super-Class。分析显示各类别内部成分复杂（如图所示），且存在严重的<strong>长尾分布</strong>。Class 0 (良性痣) 样本量过万，而部分恶性类别样本稀缺，这对模型的特征提取能力提出了极高要求。
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-100 rounded-xl p-4 h-80 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300">
-                        [在此处插入你的 UMAP 或分布图]
+                    <div class="bg-gray-100 rounded-xl p-2 shadow-inner border border-gray-200">
+                        <!-- 图片 1: 4_subclass_composition_v2.jpg -->
+                        <img src="4_subclass_composition_v2.jpg" alt="Subclass Composition" class="w-full h-auto rounded-lg zoom-img">
+                        <p class="text-center text-sm text-gray-500 mt-2">图 1: 5 大类内部的细粒度子类分布堆叠图</p>
+                    </div>
+                </div>
+
+                <!-- 图表 2: UMAP -->
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 md:order-1 bg-gray-100 rounded-xl p-2 shadow-inner border border-gray-200">
+                        <!-- 图片 2: 7_umap_official_zero_shot.jpg -->
+                        <img src="7_umap_official_zero_shot.jpg" alt="Zero-shot UMAP" class="w-full h-auto rounded-lg zoom-img">
+                        <p class="text-center text-sm text-gray-500 mt-2">图 2: 预训练模型特征空间可视化 (Zero-Shot)</p>
+                    </div>
+                    <div class="order-1 md:order-2 space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-purple-100 p-3 rounded-lg mr-4 text-purple-600"><i class="fa-solid fa-project-diagram fa-xl"></i></div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-2">特征空间重叠挑战</h3>
+                                <p class="text-gray-600">
+                                    Zero-shot UMAP 可视化揭示了关键问题：虽然模型能区分黑色素与非黑色素病变，但<strong>良性 (Class 0) 与恶性黑色素瘤 (Class 1) 在特征空间中高度纠缠</strong>。这证明了仅靠线性探测是不够的，必须进行全参数微调以重构特征流形，拉大良恶性样本的距离。
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,37 +113,48 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">模型架构与评估</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">采用 ViT-Large 骨干网络，结合迁移学习策略，在 NVIDIA GPU 上进行了 20 Epochs 的全参数微调。</p>
+                <p class="text-gray-600 max-w-2xl mx-auto">采用 ViT-Large 骨干网络，结合 Weighted Random Sampling 策略，在 NVIDIA GPU 上进行了 20 Epochs 的全参数微调。</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-green-500">
+                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-green-500 transform hover:-translate-y-1 transition">
                     <div class="text-4xl font-bold text-gray-800 mb-2">91.15%</div>
                     <div class="text-green-600 font-medium">总体准确率 (Accuracy)</div>
                 </div>
-                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-blue-500">
+                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-blue-500 transform hover:-translate-y-1 transition">
                     <div class="text-4xl font-bold text-gray-800 mb-2">0.939</div>
                     <div class="text-blue-600 font-medium">AUROC</div>
                 </div>
-                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-purple-500">
+                <div class="bg-white p-8 rounded-xl shadow-md text-center border-t-4 border-purple-500 transform hover:-translate-y-1 transition">
                     <div class="text-4xl font-bold text-gray-800 mb-2">0.906</div>
                     <div class="text-purple-600 font-medium">加权 F1-Score</div>
                 </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-md p-8">
-                <h3 class="text-xl font-bold mb-6">混淆矩阵分析</h3>
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fa-solid fa-table-cells text-blue-600 mr-2"></i> 混淆矩阵分析
+                </h3>
                 <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="w-full md:w-1/2 h-64 bg-gray-100 rounded flex items-center justify-center text-gray-400">
-                        [在此处插入 confusion_matrix_result.jpg]
+                    <div class="w-full md:w-1/2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                        <!-- 图片 3: confusion_matrix_... .png -->
+                        <img src="confusion_matrix_derm12345_5class_official_split.png" alt="Confusion Matrix" class="w-full h-auto rounded zoom-img">
                     </div>
                     <div class="w-full md:w-1/2 space-y-4">
-                        <p class="text-gray-600">模型在 <strong>Class 0 (良性)</strong> 和 <strong>Class 4 (非黑恶性)</strong> 上表现优异。尽管样本稀缺，通过加权采样策略，模型在 <strong>Class 1 (黑色素瘤)</strong> 上的召回率得到了显著提升，有效降低了漏诊风险。</p>
-                        <ul class="list-disc list-inside text-gray-600 space-y-2">
-                            <li>骨干网络: <span class="font-mono text-blue-600">PanDerm (ViT-Large)</span></li>
-                            <li>优化器: <span class="font-mono text-blue-600">AdamW (lr=5e-4)</span></li>
-                            <li>训练策略: <span class="font-mono text-blue-600">Full Fine-Tuning + Weighted Sampling</span></li>
-                        </ul>
+                        <p class="text-gray-600">
+                            混淆矩阵显示，模型在 <strong>Class 0 (良性)</strong> 和 <strong>Class 4 (非黑恶性)</strong> 上表现优异（对角线颜色深）。
+                        </p>
+                        <p class="text-gray-600">
+                            尽管样本稀缺，通过<strong>加权采样策略</strong>，模型在最关键的 <strong>Class 1 (黑色素瘤)</strong> 上的识别能力得到了显著保障。虽然仍有部分误判为良性，但相比线性探测阶段，召回率已有质的提升。
+                        </p>
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800">
+                            <strong>技术栈：</strong>
+                            <ul class="list-disc list-inside mt-2">
+                                <li>Backbone: PanDerm (ViT-L)</li>
+                                <li>Optimizer: AdamW (lr=5e-4)</li>
+                                <li>Strategy: Full Fine-Tuning + Weighted Sampling</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,60 +164,41 @@
     <!-- 前端演示 -->
     <section id="demo" class="py-20 bg-blue-600 text-white">
         <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
-            <div class="md:w-1/2">
-                <span class="bg-blue-800 text-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Live Demo</span>
+            <div class="md:w-5/12">
+                <span class="bg-blue-800 text-blue-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Live Deployment</span>
                 <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-6">PanDerm Pro 诊断系统</h2>
-                <p class="text-blue-100 text-lg mb-8">
-                    为了将研究转化为临床应用，我们开发了基于 Streamlit 的交互式 Web 系统。医生只需上传皮肤镜图片，系统即可实时加载微调后的权重文件，给出诊断建议及置信度分析。
+                <p class="text-blue-100 text-lg mb-8 leading-relaxed">
+                    为了将研究转化为临床应用，我们开发了基于 Streamlit 的交互式 Web 系统。
+                    <br><br>
+                    系统后端实时加载微调后的权重文件，自动适配 Mac (MPS) 或 Windows (CUDA) 加速。医生只需上传图片，即可获得秒级诊断建议及详细的概率分布。
                 </p>
-                <div class="flex space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-brands fa-python fa-lg"></i>
-                        <span>Python</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-bolt fa-lg"></i>
-                        <span>Streamlit</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-brain fa-lg"></i>
-                        <span>PyTorch</span>
-                    </div>
+                <div class="flex flex-wrap gap-3">
+                    <span class="px-3 py-1 bg-white/20 rounded-full text-sm"><i class="fa-brands fa-python mr-1"></i> Python</span>
+                    <span class="px-3 py-1 bg-white/20 rounded-full text-sm"><i class="fa-solid fa-bolt mr-1"></i> Streamlit</span>
+                    <span class="px-3 py-1 bg-white/20 rounded-full text-sm"><i class="fa-solid fa-brain mr-1"></i> PyTorch</span>
                 </div>
             </div>
-            <div class="md:w-1/2 bg-white rounded-lg shadow-2xl p-2 transform rotate-2 hover:rotate-0 transition duration-300">
-                <!-- 这里放你的网页截图 -->
-                <div class="aspect-video bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                    [插入网页运行截图]
+            <div class="md:w-7/12">
+                <div class="bg-gray-900 rounded-lg shadow-2xl p-2 transform rotate-1 hover:rotate-0 transition duration-500 border border-gray-700">
+                    <!-- 图片 4: websiterun.png (请确保文件名一致) -->
+                    <img src="websiterun.png" alt="Web App Screenshot" class="w-full h-auto rounded shadow-lg">
                 </div>
+                <p class="text-center text-blue-200 text-sm mt-4 italic">系统运行截图 (macOS 环境)</p>
             </div>
         </div>
     </section>
 
     <!-- 代码附录 -->
-    <section id="code" class="py-20 bg-gray-50">
+    <section id="code" class="py-20 bg-white">
         <div class="max-w-5xl mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">核心代码实现</h2>
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">核心代码实现</h2>
             
             <div class="space-y-8">
-                <div>
-                    <h3 class="text-xl font-semibold mb-4 flex items-center"><i class="fa-solid fa-code mr-2 text-blue-600"></i> 1. 数据集划分与清洗</h3>
-                    <div class="code-block">
-                        <pre><code>import pandas as pd
-# 核心逻辑：根据官方 Split 划分训练/验证/测试集
-def generate_csv():
-    # ... (此处展示 step1_make_csv.py 的核心逻辑)
-    # 映射 40 个子类到 5 个 SuperClass
-    folder_to_label = {...} 
-    # 随机切分 10% 为验证集
-    val_count = int(len(train_data) * 0.1)
-    # ...</code></pre>
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 font-mono text-sm font-bold text-gray-600">
+                        1. 全参数微调启动脚本 (Fine-tuning)
                     </div>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-semibold mb-4 flex items-center"><i class="fa-solid fa-code mr-2 text-blue-600"></i> 2. 全参数微调启动脚本</h3>
-                    <div class="code-block">
+                    <div class="code-block rounded-none">
                         <pre><code># 启动训练：启用 Weighted Sampler 解决不平衡
 cmd = (
     f"python run_class_finetuning.py "
@@ -198,18 +212,25 @@ os.system(cmd)</code></pre>
                     </div>
                 </div>
 
-                <div>
-                    <h3 class="text-xl font-semibold mb-4 flex items-center"><i class="fa-solid fa-code mr-2 text-blue-600"></i> 3. Streamlit 部署 (Mac MPS 加速)</h3>
-                    <div class="code-block">
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 font-mono text-sm font-bold text-gray-600">
+                        2. Streamlit 部署 (Mac MPS 加速适配)
+                    </div>
+                    <div class="code-block rounded-none">
                         <pre><code>@st.cache_resource
 def load_model_mac():
-    # 自动适配 Apple Silicon
+    # 自动适配 Apple Silicon (M1/M2/M3)
     device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
-    # 手动构建 5 分类模型结构
+    
+    # 手动构建 5 分类模型结构 (显式开启 Mean Pooling)
+    from models.modeling_finetune import panderm_large_patch16_224
     model = panderm_large_patch16_224(num_classes=5, use_mean_pooling=True)
-    # 加载微调权重
+    
+    # 加载微调权重 (处理 DDP 前缀)
     checkpoint = torch.load(MODEL_PATH, map_location='cpu')
-    model.load_state_dict(checkpoint['model'], strict=False)
+    new_state_dict = {k.replace("module.", ""): v for k, v in checkpoint['model'].items()}
+    model.load_state_dict(new_state_dict, strict=False)
+    
     return model.to(device).eval()</code></pre>
                     </div>
                 </div>
@@ -218,7 +239,10 @@ def load_model_mac():
     </section>
 
     <footer class="bg-gray-900 text-gray-400 py-12 text-center border-t border-gray-800">
-        <p>&copy; 2025 皮肤病变智能诊断系统课程作业. Built with <i class="fa-solid fa-heart text-red-500 mx-1"></i> and PanDerm.</p>
+        <div class="max-w-6xl mx-auto px-4">
+            <p class="mb-2">&copy; 2025 皮肤病变智能诊断系统课程作业.</p>
+            <p class="text-sm text-gray-600">Built with <i class="fa-solid fa-heart text-red-500 mx-1"></i> using PanDerm & Streamlit.</p>
+        </div>
     </footer>
 
 </body>
